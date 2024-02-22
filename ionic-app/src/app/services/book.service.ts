@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Book } from '../model/book';
 import { environment } from '../../environments/environment';
+import { EventEmitter } from '@angular/core';
 
 
 @Injectable({
@@ -10,9 +11,12 @@ import { environment } from '../../environments/environment';
 })
 export class BookService {
 
-  constructor(protected http: HttpClient) {
+  constructor(protected http: HttpClient) {}
 
-  }
+  newBook = new EventEmitter<Book>();
+  deletedBook = new EventEmitter<number>();
+  
+  
 
   getBooks(size? :number): Observable<Book[]> {
     let params = new HttpParams();
@@ -21,5 +25,28 @@ export class BookService {
     params = params.append('sortDir', 'asc');
     params = params.append('sort', 'id');
     return this.http.get<Book[]>(environment.urlAPI + '/books', { params });
+  }
+  createBook(book: Book) {
+    return new Promise(resolve => {
+      this.http.post(environment.urlAPI + '/books', book)
+        .subscribe((response: any) => {
+          this.newBook.emit(response);
+          resolve(true);
+        });
+    });
+  }
+
+  updateReview(book: Book) {
+    return this.http.put(environment.urlAPI + '/reviews/' + book.id, book);
+  }
+
+  deleteBook(bookId: number) {
+    return new Promise(resolve => {
+      return this.http.delete(environment.urlAPI + '/reviews/' + bookId)
+      .subscribe( (response) => {
+        this.deletedBook.emit(bookId);
+        resolve(true);
+      });
+    });
   }
 }

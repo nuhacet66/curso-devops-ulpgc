@@ -1,6 +1,6 @@
-FROM node:19-alpine
+FROM node
 
-ENV MYNAME="me"
+ENV MYNAME="nuha"
 
 WORKDIR /app
 
